@@ -1,6 +1,8 @@
 {
-  "name": "EzySeva Digital Services & PVC Card Portal",
+  "name": "MA TARA CYBER CAFE",
   "description": "Comprehensive online Seva Kendra portal with customer login, PVC card order tracking, UPI payment gateway, invoice generation, and full admin customization.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }

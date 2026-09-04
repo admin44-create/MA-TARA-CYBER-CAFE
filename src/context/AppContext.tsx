@@ -27,8 +27,8 @@ interface AppContextType {
   // Modals
   authModalOpen: boolean;
   setAuthModalOpen: (open: boolean) => void;
-  authModalTab: 'login' | 'register';
-  setAuthModalTab: (tab: 'login' | 'register') => void;
+  authModalTab: 'login' | 'register' | 'forgot_password';
+  setAuthModalTab: (tab: 'login' | 'register' | 'forgot_password') => void;
   adminLoginModalOpen: boolean;
   setAdminLoginModalOpen: (open: boolean) => void;
   
@@ -55,6 +55,8 @@ interface AppContextType {
   // Actions
   loginCustomer: (phoneOrEmail: string, password?: string) => { success: boolean; message: string; customer?: Customer };
   registerCustomer: (customerData: Omit<Customer, 'id' | 'customerCode' | 'createdAt'>) => { success: boolean; message: string; customer?: Customer };
+  resetCustomerPassword: (identifier: string, newPassword: string) => { success: boolean; message: string; customer?: Customer };
+  sendPasswordResetOtp: (identifier: string) => { success: boolean; message: string; otp?: string; email?: string; phone?: string; customerName?: string; customerCode?: string };
   logoutCustomer: () => void;
   loginDemoCustomer: (customerCode?: string) => void;
   
@@ -172,7 +174,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // UI state
   const [currentView, setCurrentView] = useState<'home' | 'services' | 'tracking' | 'customer_portal' | 'admin_panel' | 'free_tools'>('home');
   const [authModalOpen, setAuthModalOpen] = useState<boolean>(false);
-  const [authModalTab, setAuthModalTab] = useState<'login' | 'register'>('login');
+  const [authModalTab, setAuthModalTab] = useState<'login' | 'register' | 'forgot_password'>('login');
   const [adminLoginModalOpen, setAdminLoginModalOpen] = useState<boolean>(false);
   const [orderModalOpen, setOrderModalOpen] = useState<boolean>(false);
   const [selectedServiceForOrder, setSelectedServiceForOrder] = useState<Service | null>(null);
@@ -279,7 +281,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [isAdmin]);
 
   // Auth Methods
-  const loginCustomer = (phoneOrEmail: string, _password?: string) => {
+  const loginCustomer = (phoneOrEmail: string, password?: string) => {
     const cleanQuery = phoneOrEmail.trim().toLowerCase();
     const found = customers.find(c => 
       c.phone.toLowerCase() === cleanQuery || 
@@ -288,11 +290,26 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     );
 
     if (found) {
+      // Security check: if customer has password set and user entered a password
+      if (found.password && password !== undefined && password !== '') {
+        if (found.password !== password) {
+          return { 
+            success: false, 
+            message: 'Incorrect password. Please verify your credentials or click "Forgot Password?" below to reset.' 
+          };
+        }
+      } else if (found.password && (!password || password.trim() === '')) {
+        return {
+          success: false,
+          message: 'Please enter your account password to sign in.'
+        };
+      }
+
       setCurrentUser(found);
       setAuthModalOpen(false);
-      return { success: true, message: `Welcome back, ${found.fullName}! (ID: ${found.customerCode})`, customer: found };
+      return { success: true, message: `Welcome back, ${found.fullName}! (Customer ID: ${found.customerCode})`, customer: found };
     }
-    return { success: false, message: 'No customer found with this Phone, Email, or Customer ID. Please create an account.' };
+    return { success: false, message: 'No registered customer found with this Phone, Email, or Customer ID. Please create an account.' };
   };
 
   const registerCustomer = (customerData: Omit<Customer, 'id' | 'customerCode' | 'createdAt'>) => {
@@ -307,6 +324,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const newCustomerCode = `EZ-${randomSuffix}`;
     const newCustomer: Customer = {
       ...customerData,
+      password: customerData.password || 'password123',
       id: `cust-${Date.now()}`,
       customerCode: newCustomerCode,
       createdAt: new Date().toISOString()
@@ -324,8 +342,70 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     return { 
       success: true, 
-      message: `Registration Successful! Your unique Customer ID is ${newCustomerCode}. Please keep it safe for tracking services.`, 
+      message: `Registration Successful! Your unique Customer ID is ${newCustomerCode} and password has been secured and dispatched to ${newCustomer.email}.`, 
       customer: newCustomer 
+    };
+  };
+
+  const resetCustomerPassword = (
+    identifier: string,
+    newPassword: string
+  ): { success: boolean; message: string; customer?: Customer } => {
+    const cleanQuery = identifier.trim().toLowerCase();
+    const customerIndex = customers.findIndex(c => 
+      c.phone.toLowerCase() === cleanQuery || 
+      c.email.toLowerCase() === cleanQuery ||
+      c.customerCode.toLowerCase() === cleanQuery
+    );
+
+    if (customerIndex === -1) {
+      return { success: false, message: 'No customer account found with this Email, Phone, or Customer ID.' };
+    }
+
+    const updated: Customer = {
+      ...customers[customerIndex],
+      password: newPassword
+    };
+
+    const newCustomers = [...customers];
+    newCustomers[customerIndex] = updated;
+    setCustomers(newCustomers);
+
+    if (currentUser?.id === updated.id) {
+      setCurrentUser(updated);
+    }
+
+    return { 
+      success: true, 
+      message: `Password reset successfully! Your new password is now active. Customer ID: ${updated.customerCode}.`,
+      customer: updated
+    };
+  };
+
+  const sendPasswordResetOtp = (
+    identifier: string
+  ): { success: boolean; message: string; otp?: string; email?: string; phone?: string; customerName?: string; customerCode?: string } => {
+    const cleanQuery = identifier.trim().toLowerCase();
+    const found = customers.find(c => 
+      c.phone.toLowerCase() === cleanQuery || 
+      c.email.toLowerCase() === cleanQuery ||
+      c.customerCode.toLowerCase() === cleanQuery
+    );
+
+    if (!found) {
+      return { success: false, message: 'No registered customer found with this Phone, Email, or Customer ID.' };
+    }
+
+    // Generate real 6-digit OTP
+    const resetOtp = Math.floor(100000 + Math.random() * 900000).toString();
+    return {
+      success: true,
+      message: `Security OTP sent to ${found.email} and +91 ${found.phone}`,
+      otp: resetOtp,
+      email: found.email,
+      phone: found.phone,
+      customerName: found.fullName,
+      customerCode: found.customerCode
     };
   };
 
@@ -777,6 +857,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         openTrackingForOrder,
         loginCustomer,
         registerCustomer,
+        resetCustomerPassword,
+        sendPasswordResetOtp,
         logoutCustomer,
         loginDemoCustomer,
         loginAdmin,

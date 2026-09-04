@@ -442,11 +442,11 @@ export const INITIAL_SERVICES: Service[] = [
 ];
 
 export const INITIAL_SITE_SETTINGS: SiteSettings = {
-  siteName: 'EzySeva Digital Kendra',
-  tagline: 'Fastest Online Government Services & Smart PVC Card Delivery Across India',
+  siteName: 'MA TARA CYBER CAFE',
+  tagline: 'Online Seva Kendra, Smart PVC Cards, Government Forms & High-Speed Cyber Services',
   logoUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=200&h=200&q=80&fm=jpg',
-  bannerHeadline: 'Order Smart PVC Cards & Digital Govt Services in 2 Minutes',
-  bannerSubheadline: 'Get Waterproof PVC Aadhaar, Voter ID, PAN & Ayushman Cards delivered to your doorstep via Speed Post with real-time tracking.',
+  bannerHeadline: 'MA TARA CYBER CAFE - Smart PVC Cards & Digital Govt Services',
+  bannerSubheadline: 'Doorstep Speed Post delivery for PVC Aadhaar, Voter, PAN, Ayushman cards, and online form services across all districts.',
   bannerImageUrl: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=1600&h=600&q=80&fm=jpg',
   bannerBadge: '⚡ Over 45,000+ Happy Customers & CSC Certified',
   noticeText: '📢 Special Notice: High Speed Post delivery active to all West Bengal, Bihar, UP and Pan-India districts. Use your Customer ID to track all orders in real-time!',

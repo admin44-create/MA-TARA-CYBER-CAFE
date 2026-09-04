@@ -55,7 +55,7 @@ export const FreeTools: React.FC = () => {
     if (!files || files.length === 0) return;
 
     const newPages: JpgPage[] = [];
-    const promises = Array.from(files).map((file) => {
+    const promises = Array.from(files).map((file: File) => {
       return new Promise<void>((resolve) => {
         const reader = new FileReader();
         reader.onload = (event) => {

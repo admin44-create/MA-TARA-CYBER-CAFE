@@ -41,6 +41,7 @@ import {
   Hash
 } from 'lucide-react';
 import { getWhatsAppChatUrl, buildAdminCustomerAlertMessage } from '../utils/whatsapp';
+import { JpgImageUploader } from './JpgImageUploader';
 
 export const AdminPanel: React.FC = () => {
   const { 
@@ -281,9 +282,17 @@ export const AdminPanel: React.FC = () => {
 
   // Preset Banner Images (JPG)
   const PRESET_BANNERS = [
-    { label: 'Government & Digital Kendra', url: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=1600&h=600&q=80' },
-    { label: 'Technology & Smart Cards', url: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=1600&h=600&q=80' },
-    { label: 'India Post & Logistics Hub', url: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1600&h=600&q=80' }
+    { label: 'MA TARA CYBER CAFE Official', url: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=1600&h=600&q=80&fm=jpg' },
+    { label: 'Smart PVC & High Speed Digital Cards', url: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=1600&h=600&q=80&fm=jpg' },
+    { label: 'India Post Speed Post Logistics Hub', url: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1600&h=600&q=80&fm=jpg' },
+    { label: 'CSC e-Governance Seva Portal', url: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1600&h=600&q=80&fm=jpg' }
+  ];
+
+  // Preset Logos (JPG)
+  const PRESET_LOGOS = [
+    { label: 'Ma Tara Spiritual Emblem', url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=400&h=400&q=80&fm=jpg' },
+    { label: 'Digital Seva CSC Emblem', url: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=400&h=400&q=80&fm=jpg' },
+    { label: 'Smart PVC Chip Card', url: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=400&h=400&q=80&fm=jpg' }
   ];
 
   if (!isAdmin) {
@@ -879,25 +888,17 @@ export const AdminPanel: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
-                Logo Image URL (JPG / PNG)
-              </label>
-              <div className="flex items-center gap-3">
-                <input
-                  type="text"
-                  value={customLogoUrl}
-                  onChange={(e) => setCustomLogoUrl(e.target.value)}
-                  placeholder="https://.../logo.jpg"
-                  className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-xl font-mono"
-                />
-                {customLogoUrl && (
-                  <img
-                    src={customLogoUrl}
-                    alt="Logo preview"
-                    className="w-10 h-10 rounded-xl object-cover border border-slate-300 shrink-0"
-                  />
-                )}
-              </div>
+              <JpgImageUploader
+                label="Upload Logo (JPG / PNG File)"
+                description="Select JPG image file directly from computer or phone (no link needed). Displays in header navigation, invoices, and receipts."
+                currentImageUrl={customLogoUrl}
+                onImageChange={(newUrl) => setCustomLogoUrl(newUrl)}
+                maxDimension={400}
+                quality={0.9}
+                aspectRatioHint="Recommended: Square JPG (400x400px)"
+                presets={PRESET_LOGOS}
+                variant="logo"
+              />
             </div>
           </div>
 
@@ -938,31 +939,17 @@ export const AdminPanel: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
-                Banner Background Image URL (JPG)
-              </label>
-              <input
-                type="text"
-                value={customBannerImageUrl}
-                onChange={(e) => setCustomBannerImageUrl(e.target.value)}
-                placeholder="https://.../banner.jpg"
-                className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-xl font-mono mb-2"
+              <JpgImageUploader
+                label="Upload Hero Banner Image (JPG File)"
+                description="Select high-resolution JPG banner file directly from your computer or phone (no link needed). Displays as website hero background."
+                currentImageUrl={customBannerImageUrl}
+                onImageChange={(newUrl) => setCustomBannerImageUrl(newUrl)}
+                maxDimension={1600}
+                quality={0.85}
+                aspectRatioHint="Recommended: Wide JPG (1600x600px)"
+                presets={PRESET_BANNERS}
+                variant="banner"
               />
-
-              {/* Preset Quick Selectors */}
-              <div className="flex flex-wrap gap-2">
-                <span className="text-[11px] text-slate-500 font-bold self-center">Choose Preset Banner (JPG):</span>
-                {PRESET_BANNERS.map((preset, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => setCustomBannerImageUrl(preset.url)}
-                    className="text-[10px] font-semibold bg-slate-100 hover:bg-slate-200 text-slate-800 px-2.5 py-1 rounded-lg border border-slate-200 transition-colors"
-                  >
-                    {preset.label}
-                  </button>
-                ))}
-              </div>
             </div>
 
             <div>
@@ -1004,24 +991,16 @@ export const AdminPanel: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
-                Custom UPI QR Code Image URL (JPG / PNG)
-              </label>
-              <div className="flex items-center gap-3">
-                <input
-                  type="text"
-                  value={customUpiQrUrl}
-                  onChange={(e) => setCustomUpiQrUrl(e.target.value)}
-                  className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-xl font-mono"
-                />
-                {customUpiQrUrl && (
-                  <img
-                    src={customUpiQrUrl}
-                    alt="QR preview"
-                    className="w-12 h-12 rounded-lg border border-slate-300 shrink-0 object-contain"
-                  />
-                )}
-              </div>
+              <JpgImageUploader
+                label="Upload Custom UPI QR Code (JPG File)"
+                description="Upload PhonePe / Google Pay / Paytm QR code JPG directly from your phone or PC. Scanned by customers during payment."
+                currentImageUrl={customUpiQrUrl}
+                onImageChange={(newUrl) => setCustomUpiQrUrl(newUrl)}
+                maxDimension={600}
+                quality={0.9}
+                aspectRatioHint="Recommended: Square JPG QR Code (500x500px)"
+                variant="qr"
+              />
             </div>
           </div>
 

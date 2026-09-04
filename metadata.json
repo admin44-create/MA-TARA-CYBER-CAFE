@@ -1,0 +1,6 @@
+{
+  "name": "EzySeva Digital Services & PVC Card Portal",
+  "description": "Comprehensive online Seva Kendra portal with customer login, PVC card order tracking, UPI payment gateway, invoice generation, and full admin customization.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
